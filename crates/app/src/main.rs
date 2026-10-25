@@ -36,7 +36,27 @@ use swiftget_engine::{
 
 pub(crate) const APP: &str = "Pop Download";
 
-// Windows AppsUseLightTheme registry value: 0 = dark, 1 = light.\n// Fall back to dark on other platforms/errors.\nfn popdownload_windows_theme() -> i32 {\n    #[cfg(target_os = "windows")]\n    {\n        if let Ok(v) = std::process::Command::new("reg")\n            .args(["query", r"HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "/v", "AppsUseLightTheme"])\n            .output()\n        {\n            let output = String::from_utf8_lossy(&v.stdout);\n            if output.contains("0x1") { return 0; }\n            if output.contains("0x0") { return 1; }\n        }\n    }\n    1\n}\n\n
+// Windows AppsUseLightTheme registry value: 0 = dark, 1 = light.
+// Read Windows application theme at startup.
+fn popdownload_windows_theme() -> i32 {
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(result) = std::process::Command::new("reg")
+            .args([
+                "query",
+                r"HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+                "/v",
+                "AppsUseLightTheme",
+            ])
+            .output()
+        {
+            let output = String::from_utf8_lossy(&result.stdout);
+            if output.contains("0x1") { return 0; }
+            if output.contains("0x0") { return 1; }
+        }
+    }
+    1
+}
 
 /// What the browser extension sends along with a video link.
 #[derive(Default, Clone)]

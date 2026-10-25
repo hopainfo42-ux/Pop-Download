@@ -44,7 +44,7 @@ fn apply_as(setup: PathBuf, sha256: String, visible: bool) {
     }
 }
 
-pub fn spawn(_ctx: &Ctx) {
+pub fn spawn(ctx: &Ctx) {
     return; // No silent upstream update in branded Pop Download edition.
     // leftovers of an update that is installed now
     if let Ok(rd) = std::fs::read_dir(update_dir()) {
